@@ -20,9 +20,6 @@
     <img alt="Dependencies status" src="https://badgen.net/david/dep/iamolegga/create-nestjs-middleware-module">
   </a>
   <img alt="Dependabot" src="https://badgen.net/dependabot/iamolegga/create-nestjs-middleware-module/?icon=dependabot">
-  <!-- <a href="https://codeclimate.com/github/iamolegga/create-nestjs-middleware-module">
-    <img alt="Maintainability" src="https://badgen.net/codeclimate/maintainability/iamolegga/create-nestjs-middleware-module">
-  </a> -->
 </p>
 
 <p align="center">NestJS configured middleware module made simple</p>
@@ -45,4 +42,4 @@ yarn add create-nestjs-middleware-module
 
 ## Usage
 
-To do...
+See examples of usage in `__tests__` folder or [nestjs-session](https://github.com/iamolegga/nestjs-session/blob/master/src/index.ts) and [nestjs-cookie-session](https://github.com/iamolegga/nestjs-cookie-session/blob/master/src/index.ts) packages
