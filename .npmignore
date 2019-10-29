@@ -1,0 +1,10 @@
+__tests__/
+coverage/
+examples/
+src/
+.github/
+.prettierrc
+.travis.yml
+tsconfig.build.json
+tsconfig.json
+tslint.json
