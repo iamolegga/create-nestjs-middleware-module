@@ -1,8 +1,8 @@
 __tests__/
 coverage/
-examples/
 src/
 .github/
+.mergify.yml
 .prettierrc
 .travis.yml
 tsconfig.build.json
