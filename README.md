@@ -26,7 +26,7 @@
 
 ## What is it?
 
-It is a tiny helper library that helps you create _idiomatic_ **NestJS** module based on `Express`/`Fastify` middleware in just a few lines of code.
+It is a tiny helper library that helps you create simple _idiomatic_ **NestJS** module based on `Express`/`Fastify` middleware in just a few lines of code with routing out of the box.
 
 ## Install
 
@@ -42,4 +42,126 @@ yarn add create-nestjs-middleware-module
 
 ## Usage
 
+Let's imaging you want to create some simple timing logger
+
+```ts
+import {
+  AsyncOptions,
+  createModule,
+  SyncOptions,
+} from 'create-nestjs-middleware-module';
+
+// 1. Create options interface for your middleware
+interface Options {
+  maxDuration: number
+}
+
+// 2. Create and export `TimingModule`
+export const TimingModule = createModule<Options>(options => {
+  const { maxDuration } = options;
+
+  return (request, response, next) => {
+    const start = Date.now();
+
+    response.on('finish', () => {
+      const message = `${request.method} ${request.path} - ${duration}ms`;
+
+      const duration = Date.now() - start;
+
+      if (duration > maxDuration) {
+        console.warn(message);
+      } else {
+        console.log(message);
+      }
+    });
+
+    next();
+  };
+});
+```
+
+That's it, your module is ready. Let's see what API it has:
+
+```ts
+import { TimingModule } from 'timing-module';
+import { MyController } from './my.controller';
+
+@Module({
+  imports: [
+
+    // 1. `.forRoot()` method accept params satisfying `Options` interface
+    TimingModule.forRoot({ maxDuration: 1000 }),
+
+    // 2. `.forRoot()` method accept additional optional routing params
+    TimingModule.forRoot({
+      maxDuration: 1000,
+
+      // both `forRoutes` and `exclude` properties are optional
+      // and has the same API as NestJS buil-in `MiddlewareConfigProxy`
+      // @see https://docs.nestjs.com/middleware#applying-middleware
+      forRoutes: [MyController],
+      exclude: [{ method: RequestMethod.ALL, path: 'always-fast' }],
+    }),
+
+    // 3. `.forRootAsync()` method with only factory
+    TimingModule.forRootAsync({
+      useFactory: async () => {
+        return { maxDuration: 1000 }
+      }
+    }),
+
+    // 4. `.forRootAsync()` method with dependencies
+    TimingModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        return { maxDuration: config.maxDurationForAPIHandler }
+      }
+    }),
+
+    // 5. `.forRootAsync()` method with routing
+    TimingModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        return {
+          maxDuration: config.maxDurationForAPIHandler
+
+          // both `forRoutes` and `exclude` properties are optional
+          // and has the same API as NestJS buil-in `MiddlewareConfigProxy`
+          // @see https://docs.nestjs.com/middleware#applying-middleware
+          forRoutes: [MyController],
+          exclude: [{ method: RequestMethod.ALL, path: 'always-fast' }],
+        };
+      }
+    }),
+  ]
+  controllers: [MyController /*, ... */]
+})
+class App {}
+```
+
+## More examples
+
 See examples of usage in `__tests__` folder or [nestjs-session](https://github.com/iamolegga/nestjs-session/blob/master/src/index.ts) and [nestjs-cookie-session](https://github.com/iamolegga/nestjs-cookie-session/blob/master/src/index.ts) packages
+
+## Notes
+
+1. `createModule` callback function can return not only one middleware, but array of it.
+2. If your `Options` interface has not __required__ properties it can be frustrating to force end-users of your module to call `forRoot({})`, and for better developer expirience you can cast `createModule(...)` result to `FacadeModuleStaticOptional<Options>`, then `forRoot()` could be called without arguments and without TS error. Then your `createModule` callback function will be called with empty object `{}`.
+3. For better developer expirience of end-users of your module you can also export interfaces of `forRoot` and `forRootAsync` argument:
+
+```ts
+import {
+  AsyncOptions,
+  SyncOptions,
+} from 'create-nestjs-middleware-module';
+
+interface Options {
+  // ...
+}
+
+export type MyModuleOptions = SyncOptions<Options>;
+
+export type MyModuleAsyncOptions = AsyncOptions<Options>;
+```
