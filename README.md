@@ -148,7 +148,41 @@ See examples of usage in `__tests__` folder or [nestjs-session](https://github.c
 ## Notes
 
 1. `createModule` callback function can return not only one middleware, but array of it.
+
+```ts
+import { createModule } from 'create-nestjs-middleware-module';
+
+
+interface Options {
+  // ...
+}
+
+createModule<Options>((options) => {
+  function firstMidlleware() { /* ... */ }
+  function secondMidlleware() { /* ... */ }
+  return [firstMidlleware, secondMidlleware]
+});
+```
+
 2. If your `Options` interface has not __required__ properties it can be frustrating to force end-users of your module to call `forRoot({})`, and for better developer expirience you can cast `createModule(...)` result to `FacadeModuleStaticOptional<Options>`, then `forRoot()` could be called without arguments and without TS error. Then your `createModule` callback function will be called with empty object `{}`.
+
+```ts
+import { createModule, FacadeModuleStaticOptional } from 'create-nestjs-middleware-module';
+
+interface Options {
+  maxDuration?: number;
+}
+
+createModule<Options>((options) => {
+  typeof options // always "object" even if not passed to `forRoot()`
+
+  return (request, response, next) => {
+    // ...
+    next();
+  };
+}) as FacadeModuleStaticOptional<Options>;
+```
+
 3. For better developer expirience of end-users of your module you can also export interfaces of `forRoot` and `forRootAsync` argument:
 
 ```ts
@@ -165,3 +199,5 @@ export type MyModuleOptions = SyncOptions<Options>;
 
 export type MyModuleAsyncOptions = AsyncOptions<Options>;
 ```
+
+4. This library is tested against `express` and `fastify`. But you should be aware that middlewares of `express` are not always works with `fastify` and vise versa. Sometimes you can check platforms internally. Sometimes maybe it's better to create 2 separate modules for each platform. It's up to you.
