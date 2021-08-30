@@ -9,7 +9,17 @@ import {
 } from '@nestjs/common/interfaces';
 
 export type SyncOptions<T> = T & {
+  /**
+   * Same as NestJS buil-in `MiddlewareConfigProxy.forRoutes`
+   * @see https://docs.nestjs.com/middleware#applying-middleware.
+   * Use `forRoutes` and `exclude` to control which path should exec passed middleware.
+   */
   forRoutes?: Parameters<MiddlewareConfigProxy['forRoutes']>;
+  /**
+   * Same as NestJS buil-in `MiddlewareConfigProxy.exclude`
+   * @see https://docs.nestjs.com/middleware#applying-middleware.
+   * Use `forRoutes` and `exclude` to control which path should exec passed middleware.
+   */
   exclude?: Parameters<MiddlewareConfigProxy['exclude']>;
 };
 
