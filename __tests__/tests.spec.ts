@@ -46,7 +46,7 @@ for (const PlatformAdapter of platforms) {
   describe(PlatformAdapter.name, () => {
     it('empty forRoot() and casting to FacadeModuleStaticOptional<T> calls with empty object', async () => {
       const createMiddleware = jest.fn(
-        _params => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: any, _res: any, next: Function) => {
           next();
         },
       );
@@ -58,7 +58,8 @@ for (const PlatformAdapter of platforms) {
       @Controller('/')
       class TestController {
         @Get()
-        get() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        get() {}
       }
 
       @Module({
@@ -76,7 +77,7 @@ for (const PlatformAdapter of platforms) {
 
     it('forRoot() arguments are correct', async () => {
       const createMiddleware = jest.fn(
-        _params => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: any, _res: any, next: Function) => {
           next();
         },
       );
@@ -86,7 +87,8 @@ for (const PlatformAdapter of platforms) {
       @Controller('/')
       class TestController {
         @Get()
-        get() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        get() {}
       }
 
       @Module({
@@ -104,7 +106,7 @@ for (const PlatformAdapter of platforms) {
 
     it('forRootAsync() arguments are correct', async () => {
       const createMiddleware = jest.fn(
-        _params => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: any, _res: any, next: Function) => {
           next();
         },
       );
@@ -114,7 +116,8 @@ for (const PlatformAdapter of platforms) {
       @Controller('/')
       class TestController {
         @Get()
-        get() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        get() {}
       }
 
       @Module({
@@ -134,7 +137,7 @@ for (const PlatformAdapter of platforms) {
       const m1 = jest.fn();
       const m2 = jest.fn();
 
-      const createMiddleware = jest.fn(_params => [
+      const createMiddleware = jest.fn((_params) => [
         (_req: any, _res: any, next: Function) => {
           m1();
           next();
@@ -150,7 +153,8 @@ for (const PlatformAdapter of platforms) {
       @Controller('/')
       class TestController {
         @Get()
-        get() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        get() {}
       }
 
       @Module({
@@ -172,7 +176,7 @@ for (const PlatformAdapter of platforms) {
       const countFn = jest.fn();
 
       const createMiddleware = jest.fn(
-        _params => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: any, _res: any, next: Function) => {
           countFn();
           next();
         },
@@ -183,10 +187,12 @@ for (const PlatformAdapter of platforms) {
       @Controller('/')
       class TestController {
         @Get('allow')
-        allowed() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        allowed() {}
 
         @Get('forbid')
-        forbidden() {} // tslint:disable-line: no-empty
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        forbidden() {}
       }
 
       @Module({
