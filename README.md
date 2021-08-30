@@ -40,24 +40,14 @@ yarn add create-nestjs-middleware-module
 
 ## Usage
 
-Let's imaging you want to create some simple timing logger
+Let's imaging you have some middleware factory, for example, simple logger:
 
 ```ts
-import {
-  AsyncOptions,
-  createModule,
-  SyncOptions,
-} from 'create-nestjs-middleware-module';
-
-// 1. Create options interface for your middleware
-interface Options {
+export interface Options {
   maxDuration: number
 }
 
-// 2. Create and export `TimingModule`
-export const TimingModule = createModule<Options>(options => {
-  const { maxDuration } = options;
-
+export function createResponseDurationLoggerMiddleware(opts: Options) {
   return (request, response, next) => {
     const start = Date.now();
 
@@ -75,13 +65,22 @@ export const TimingModule = createModule<Options>(options => {
 
     next();
   };
-});
+}
+```
+
+And you want to create an idiomatic NestJS module based on that middleware. Just pass this middleware factory to `createModule` function:
+
+```ts
+import { createModule } from 'create-nestjs-middleware-module';
+import { Options, createResponseDurationLoggerMiddleware } from './middleware';
+
+export const TimingModule = createModule<Options>(createResponseDurationLoggerMiddleware);
 ```
 
 That's it, your module is ready. Let's see what API it has:
 
 ```ts
-import { TimingModule } from 'timing-module';
+import { TimingModule } from './timing-module';
 import { MyController } from './my.controller';
 
 @Module({
@@ -162,7 +161,7 @@ createModule<Options>((options) => {
 });
 ```
 
-2. If your `Options` interface has not __required__ properties it can be frustrating to force end-users of your module to call `forRoot({})`, and for better developer expirience you can cast `createModule(...)` result to `FacadeModuleStaticOptional<Options>`, then `forRoot()` could be called without arguments and without TS error. Then your `createModule` callback function will be called with empty object `{}`.
+1. If your `Options` interface has not __required__ properties it can be frustrating to force end-users of your module to call `forRoot({})`, and for better developer expirience you can cast `createModule(...)` result to `FacadeModuleStaticOptional<Options>`, then `forRoot()` could be called without arguments and without TS error. In such case `createModule` callback function will be called with empty object `{}`.
 
 ```ts
 import { createModule, FacadeModuleStaticOptional } from 'create-nestjs-middleware-module';
@@ -181,7 +180,7 @@ createModule<Options>((options) => {
 }) as FacadeModuleStaticOptional<Options>;
 ```
 
-3. For better developer expirience of end-users of your module you can also export interfaces of `forRoot` and `forRootAsync` argument:
+3. For better developer experience of end-users of your module you can also export interfaces of `forRoot` and `forRootAsync` argument:
 
 ```ts
 import {
@@ -198,4 +197,4 @@ export type MyModuleOptions = SyncOptions<Options>;
 export type MyModuleAsyncOptions = AsyncOptions<Options>;
 ```
 
-4. This library is tested against `express` and `fastify`. But you should be aware that middlewares of `express` are not always works with `fastify` and vise versa. Sometimes you can check platforms internally. Sometimes maybe it's better to create 2 separate modules for each platform. It's up to you.
+4. This library is tested against `express` and `fastify`. But you should be aware that middlewares of `express` are not always work with `fastify` and vise versa. Sometimes you can check platforms internally. Sometimes maybe it's better to create 2 separate modules for each platform. It's up to you.
