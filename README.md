@@ -4,7 +4,7 @@
   <a href="https://www.npmjs.com/package/create-nestjs-middleware-module">
     <img alt="npm" src="https://img.shields.io/npm/v/create-nestjs-middleware-module" />
   </a>
-  <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module">
+  <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module" />
   <a href="https://codeclimate.com/github/iamolegga/create-nestjs-middleware-module/test_coverage">
     <img src="https://api.codeclimate.com/v1/badges/88d8895855b09e2b6600/test_coverage" />
   </a>
