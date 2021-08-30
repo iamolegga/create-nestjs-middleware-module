@@ -4,13 +4,11 @@
   <a href="https://www.npmjs.com/package/create-nestjs-middleware-module">
     <img alt="npm" src="https://img.shields.io/npm/v/create-nestjs-middleware-module" />
   </a>
-  <a href="https://travis-ci.org/iamolegga/create-nestjs-middleware-module">
-    <img alt="Travis (.org)" src="https://img.shields.io/travis/iamolegga/create-nestjs-middleware-module" />
+  <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module">
+  <a href="https://codeclimate.com/github/iamolegga/create-nestjs-middleware-module/test_coverage">
+    <img src="https://api.codeclimate.com/v1/badges/88d8895855b09e2b6600/test_coverage" />
   </a>
-  <a href="https://coveralls.io/github/iamolegga/create-nestjs-middleware-module?branch=master">
-    <img alt="Coverage Status" src="https://coveralls.io/repos/github/iamolegga/create-nestjs-middleware-module/badge.svg?branch=master" />
-  </a>
-    <img alt="Supported platforms: Express & Fastify" src="https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green" />
+  <img alt="Supported platforms: Express & Fastify" src="https://img.shields.io/badge/platforms-Express%20%26%20Fastify-green" />
 </p>
 <p align="center">
   <a href="https://snyk.io/test/github/iamolegga/create-nestjs-middleware-module">

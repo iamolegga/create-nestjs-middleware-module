@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { DynamicModule, Inject, Module, RequestMethod } from '@nestjs/common';
 import {
   MiddlewareConfigProxy,
@@ -30,7 +31,7 @@ export interface FacadeModuleStaticOptional<T> {
 const DEFAULT_ROUTES = [{ path: '*', method: RequestMethod.ALL }];
 const DEFAULT_OPTIONS: SyncOptions<{}> = {};
 
-export function createModule<T extends object>(
+export function createModule<T extends any>(
   createMiddlewares: (
     options: T,
   ) => Function | Type<any> | Array<Type<any> | Function>,
@@ -70,7 +71,7 @@ export function createModule<T extends object>(
 
     static forRootAsync(options: AsyncOptions<T>): DynamicModule {
       const optionsProvider: Provider<
-        (SyncOptions<T>) | Promise<SyncOptions<T>>
+        SyncOptions<T> | Promise<SyncOptions<T>>
       > = {
         provide: optionsToken,
         useFactory: options.useFactory,
@@ -90,8 +91,11 @@ export function createModule<T extends object>(
     ) {}
 
     configure(consumer: MiddlewareConsumer) {
-      const { exclude, forRoutes = DEFAULT_ROUTES, ...createMiddlewaresOpts } =
-        this.options || DEFAULT_OPTIONS;
+      const {
+        exclude,
+        forRoutes = DEFAULT_ROUTES,
+        ...createMiddlewaresOpts
+      } = this.options || DEFAULT_OPTIONS;
       const result = createMiddlewares(createMiddlewaresOpts as T);
 
       let middlewares: Array<Function | Type<any>>;
