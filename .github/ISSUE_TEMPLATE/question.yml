@@ -1,0 +1,44 @@
+name: ❓ Question
+description: Please ask your question.
+labels: question
+title: "[QUESTION] "
+assignees: iamolegga
+body:
+  - type: markdown
+    attributes:
+      value: |
+        :warning: Please make sure you are using the latest version of this package!
+
+        ---
+
+  - type: checkboxes
+    attributes:
+      label: Have you read the whole documentation?
+      options:
+      - label: I've read [the docs](https://github.com/iamolegga/create-nestjs-middleware-module/blob/master/README.md)
+        required: true
+
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search [here](./issues?q=is%3Aissue+label%3Aquestion) to see if an issue already exists
+      options:
+      - label: I have searched the existing issues
+        required: true
+
+  - type: markdown
+    attributes:
+      value: ---
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Question
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Anything else relevant? eg: Logs, OS version, IDE, package manager, Node.js version, etc.
+        **Tip:** You can attach images, recordings or log files by clicking this area to highlight it and then dragging files in
