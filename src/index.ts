@@ -46,7 +46,7 @@ export function createModule<T extends any>(
     options: T,
   ) => Function | Type<any> | Array<Type<any> | Function>,
 ): FacadeModuleStatic<T> {
-  const optionsToken = Symbol();
+  const optionsToken = Symbol('create-nestjs-middleware-module:options');
 
   @Module({})
   class FacadeModule {
