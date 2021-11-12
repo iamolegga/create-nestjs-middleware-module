@@ -1,6 +1,6 @@
 {
   "name": "create-nestjs-middleware-module",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "NestJS configured middleware module made simple",
   "main": "index.js",
   "types": "index.d.ts",
