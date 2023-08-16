@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   Controller,
   Get,
@@ -7,8 +8,10 @@ import {
   Type,
 } from '@nestjs/common';
 import { AbstractHttpAdapter, NestFactory } from '@nestjs/core';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
+
 import { createModule, FacadeModuleStaticOptional } from '../src';
+
 import { fastifyExtraWait } from './utils/fastifyExtraWait';
 import { platforms } from './utils/platforms';
 
@@ -23,8 +26,8 @@ interface FooModuleParamsOptional {
 let app: INestApplication;
 
 async function prepareServer(
-  testModule: any,
-  Adapter: Type<AbstractHttpAdapter<any, any, any>>,
+  testModule: unknown,
+  Adapter: Type<AbstractHttpAdapter<unknown, unknown, unknown>>,
 ) {
   app = await NestFactory.create(testModule, new Adapter(), {
     logger: false,
@@ -38,15 +41,15 @@ async function prepareServer(
 
 const params: FooModuleParams = { foo: 'bar' };
 
-afterEach(() => {
-  app.close();
+afterEach(async () => {
+  await app.close();
 });
 
 for (const PlatformAdapter of platforms) {
   describe(PlatformAdapter.name, () => {
     it('empty forRoot() and casting to FacadeModuleStaticOptional<T> calls with empty object', async () => {
       const createMiddleware = jest.fn(
-        (_params) => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: unknown, _res: unknown, next: Function) => {
           next();
         },
       );
@@ -77,7 +80,7 @@ for (const PlatformAdapter of platforms) {
 
     it('forRoot() arguments are correct', async () => {
       const createMiddleware = jest.fn(
-        (_params) => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: unknown, _res: unknown, next: Function) => {
           next();
         },
       );
@@ -106,7 +109,7 @@ for (const PlatformAdapter of platforms) {
 
     it('forRootAsync() arguments are correct', async () => {
       const createMiddleware = jest.fn(
-        (_params) => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: unknown, _res: unknown, next: Function) => {
           next();
         },
       );
@@ -138,11 +141,11 @@ for (const PlatformAdapter of platforms) {
       const m2 = jest.fn();
 
       const createMiddleware = jest.fn((_params) => [
-        (_req: any, _res: any, next: Function) => {
+        (_req: unknown, _res: unknown, next: Function) => {
           m1();
           next();
         },
-        (_req: any, _res: any, next: Function) => {
+        (_req: unknown, _res: unknown, next: Function) => {
           m2();
           next();
         },
@@ -176,7 +179,7 @@ for (const PlatformAdapter of platforms) {
       const countFn = jest.fn();
 
       const createMiddleware = jest.fn(
-        (_params) => (_req: any, _res: any, next: Function) => {
+        (_params) => (_req: unknown, _res: unknown, next: Function) => {
           countFn();
           next();
         },
