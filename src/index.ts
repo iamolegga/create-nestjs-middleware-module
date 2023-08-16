@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { DynamicModule, Inject, Module, RequestMethod } from '@nestjs/common';
 import {
+  FactoryProvider,
   MiddlewareConfigProxy,
   MiddlewareConsumer,
   ModuleMetadata,
@@ -23,10 +24,9 @@ export type SyncOptions<T> = T & {
   exclude?: Parameters<MiddlewareConfigProxy['exclude']>;
 };
 
-export interface AsyncOptions<T> extends Pick<ModuleMetadata, 'imports'> {
-  useFactory: (...args: any[]) => SyncOptions<T> | Promise<SyncOptions<T>>;
-  inject?: any[];
-}
+export interface AsyncOptions<T>
+  extends Pick<ModuleMetadata, 'imports'>,
+    Pick<FactoryProvider<T>, 'useFactory' | 'inject'> {}
 
 export interface FacadeModuleStatic<T> {
   forRoot(options: SyncOptions<T>): DynamicModule;
@@ -41,32 +41,15 @@ export interface FacadeModuleStaticOptional<T> {
 const DEFAULT_ROUTES = [{ path: '*', method: RequestMethod.ALL }];
 const DEFAULT_OPTIONS: SyncOptions<{}> = {};
 
-export function createModule<T extends any>(
+export function createModule<T>(
   createMiddlewares: (
     options: T,
-  ) => Function | Type<any> | Array<Type<any> | Function>,
+  ) => Function | Type<unknown> | Array<Type<unknown> | Function>,
 ): FacadeModuleStatic<T> {
   const optionsToken = Symbol('create-nestjs-middleware-module:options');
 
   @Module({})
-  class FacadeModule {
-    static forRoot(options: SyncOptions<T>): DynamicModule {
-      return {
-        module: FacadeModule,
-        imports: [CoreModule.forRoot(options)],
-      };
-    }
-
-    static forRootAsync(options: AsyncOptions<T>): DynamicModule {
-      return {
-        module: FacadeModule,
-        imports: [CoreModule.forRootAsync(options)],
-      };
-    }
-  }
-
-  @Module({})
-  class CoreModule {
+  class CreateNestjsMiddlewareModule {
     static forRoot(options: SyncOptions<T>): DynamicModule {
       const optionsProvider: Provider<SyncOptions<T>> = {
         provide: optionsToken,
@@ -74,13 +57,13 @@ export function createModule<T extends any>(
       };
 
       return {
-        module: CoreModule,
+        module: CreateNestjsMiddlewareModule,
         providers: [optionsProvider],
       };
     }
 
     static forRootAsync(options: AsyncOptions<T>): DynamicModule {
-      const optionsProvider: Provider<
+      const optionsProvider: FactoryProvider<
         SyncOptions<T> | Promise<SyncOptions<T>>
       > = {
         provide: optionsToken,
@@ -89,7 +72,7 @@ export function createModule<T extends any>(
       };
 
       return {
-        module: CoreModule,
+        module: CreateNestjsMiddlewareModule,
         imports: options.imports,
         providers: [optionsProvider],
       };
@@ -108,7 +91,7 @@ export function createModule<T extends any>(
       } = this.options || DEFAULT_OPTIONS;
       const result = createMiddlewares(createMiddlewaresOpts as T);
 
-      let middlewares: Array<Function | Type<any>>;
+      let middlewares: Array<Function | Type<unknown>>;
 
       if (Array.isArray(result)) {
         middlewares = result;
@@ -127,5 +110,5 @@ export function createModule<T extends any>(
     }
   }
 
-  return FacadeModule;
+  return CreateNestjsMiddlewareModule;
 }
