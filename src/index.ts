@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 import { DynamicModule, Inject, Module, RequestMethod } from '@nestjs/common';
 import {
@@ -24,9 +25,14 @@ export type SyncOptions<T> = T & {
   exclude?: Parameters<MiddlewareConfigProxy['exclude']>;
 };
 
-export interface AsyncOptions<T>
-  extends Pick<ModuleMetadata, 'imports'>,
-    Pick<FactoryProvider<T>, 'useFactory' | 'inject'> {}
+// for support of nestjs@8 we don't use
+//   extends Pick<FactoryProvider, 'provide' | 'useFactory'>
+// as it's `useFactory` return type in v8 is `T` instead of `T | Promise<T>` as
+// in feature versions, so it's not compatible
+export interface AsyncOptions<T> extends Pick<ModuleMetadata, 'imports'> {
+  useFactory: (...args: any[]) => SyncOptions<T> | Promise<SyncOptions<T>>;
+  inject?: any[];
+}
 
 export interface FacadeModuleStatic<T> {
   forRoot(options: SyncOptions<T>): DynamicModule;

@@ -124,7 +124,12 @@ for (const PlatformAdapter of platforms) {
       }
 
       @Module({
-        imports: [fooModule.forRootAsync({ useFactory: () => params })],
+        imports: [
+          fooModule.forRootAsync({
+            useFactory: (): FooModuleParams | Promise<FooModuleParams> =>
+              params,
+          }),
+        ],
         controllers: [TestController],
       })
       class TestModule {}
