@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
 import { DynamicModule, Inject, Module, RequestMethod } from '@nestjs/common';
 import {
   FactoryProvider,
@@ -44,8 +44,13 @@ export interface FacadeModuleStaticOptional<T> {
   forRootAsync(options: AsyncOptions<T>): DynamicModule;
 }
 
+/**
+ * As NestJS@11 still supports express@4 `*`-style routing by itself let's keep
+ * it for the backward compatibility. On the next major NestJS release `*` we
+ * can replace it with `/{*splat}`, and drop the support for NestJS@9 and below.
+ */
 const DEFAULT_ROUTES = [{ path: '*', method: RequestMethod.ALL }];
-const DEFAULT_OPTIONS: SyncOptions<{}> = {};
+const DEFAULT_OPTIONS: SyncOptions<Record<string, unknown>> = {};
 
 export function createModule<T>(
   createMiddlewares: (
