@@ -10,8 +10,8 @@
   <a href="https://github.com/iamolegga/create-nestjs-middleware-module/actions">
     <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module">
   </a>
-  <a href="https://codeclimate.com/github/iamolegga/create-nestjs-middleware-module/test_coverage">
-    <img src="https://api.codeclimate.com/v1/badges/88d8895855b09e2b6600/test_coverage" />
+  <a href="https://qlty.sh/gh/iamolegga/projects/create-nestjs-middleware-module">
+    <img src="https://qlty.sh/gh/iamolegga/projects/create-nestjs-middleware-module/coverage.svg" alt="Code Coverage" />
   </a>
   <a href="https://snyk.io/test/github/iamolegga/create-nestjs-middleware-module">
     <img alt="Known Vulnerabilities" src="https://snyk.io/test/github/iamolegga/create-nestjs-middleware-module/badge.svg" />
@@ -28,6 +28,17 @@
 ## What is it?
 
 It is a tiny helper library that helps you create simple _idiomatic_ **NestJS** module based on `Express`/`Fastify` middleware in just a few lines of code with routing out of the box.
+
+---
+
+<p align="center"><b>This is the documentation for v0.5. Compatibility with earlier versions:</b></p>
+
+| create-nestjs-middleware-module | NestJS | Node.js |
+| ------------------------------- | ------ | ------- |
+| v0.5                            | 11.2+, 12 | >=22.12 |
+| [v0.4](https://github.com/iamolegga/create-nestjs-middleware-module/tree/v0.4.0#readme) | 8, 9, 10, 11 | >=18 |
+
+---
 
 ## Install
 
@@ -201,6 +212,31 @@ export type MyModuleAsyncOptions = AsyncOptions<Options>;
 ```
 
 4. This library is tested against `express` and `fastify`. But you should be aware that middlewares of `express` are not always work with `fastify` and vise versa. Sometimes you can check platforms internally. Sometimes maybe it's better to create 2 separate modules for each platform. It's up to you.
+
+## Migration
+
+### v0.5
+
+NestJS 8, 9 and 10 are dropped: `@nestjs/common` and `@nestjs/core` are peer
+dependencies with the range `^11.2.0 || ^12.0.0`, and Node.js >=22.12 is
+required. The package is also published from `dist/` with an `exports` map
+instead of copying the build output into the package root, so deep imports into
+the package no longer resolve — import from the package root.
+
+The default route changed from `*` to `{/*splat}`, which fixes the global
+prefix root. With `app.setGlobalPrefix('v1')` and no explicit `forRoutes`, a
+module built with this library behaved like this:
+
+| request | before | after |
+| -------------- | ----------------- | ---------- |
+| `/v1` | **no middleware** | middleware |
+| `/v1/anything` | middleware | middleware |
+
+`path-to-regexp` v8, used by express@5 and @fastify/middie@9, no longer accepts
+the unnamed `*` wildcard, so NestJS converted it into `/v1/{*path}` — a pattern
+that matches everything under the prefix but not the prefix itself. Nothing
+changes if the end-user passes their own `forRoutes`, or if no global prefix is
+set; paths excluded from the global prefix keep the middleware as before.
 
 <h2 align="center">Do you use this library?<br/>Don't be shy to give it a star! ★</h2>
 

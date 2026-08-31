@@ -47,7 +47,7 @@ afterEach(async () => {
 for (const PlatformAdapter of platforms) {
   describe(PlatformAdapter.name, () => {
     it('empty forRoot() and casting to FacadeModuleStaticOptional<T> calls with empty object', async () => {
-      const createMiddleware = jest.fn(
+      const createMiddleware = vi.fn(
         (_params) => (_req: unknown, _res: unknown, next: () => void) => {
           next();
         },
@@ -77,7 +77,7 @@ for (const PlatformAdapter of platforms) {
     });
 
     it('forRoot() arguments are correct', async () => {
-      const createMiddleware = jest.fn(
+      const createMiddleware = vi.fn(
         (_params) => (_req: unknown, _res: unknown, next: () => void) => {
           next();
         },
@@ -105,7 +105,7 @@ for (const PlatformAdapter of platforms) {
     });
 
     it('forRootAsync() arguments are correct', async () => {
-      const createMiddleware = jest.fn(
+      const createMiddleware = vi.fn(
         (_params) => (_req: unknown, _res: unknown, next: () => void) => {
           next();
         },
@@ -138,10 +138,10 @@ for (const PlatformAdapter of platforms) {
     });
 
     it('createModule callback returning array works correct', async () => {
-      const m1 = jest.fn();
-      const m2 = jest.fn();
+      const m1 = vi.fn();
+      const m2 = vi.fn();
 
-      const createMiddleware = jest.fn((_params) => [
+      const createMiddleware = vi.fn((_params) => [
         (_req: unknown, _res: unknown, next: () => void) => {
           m1();
           next();
@@ -176,9 +176,9 @@ for (const PlatformAdapter of platforms) {
     });
 
     it('routing arguments are correct', async () => {
-      const countFn = jest.fn();
+      const countFn = vi.fn();
 
-      const createMiddleware = jest.fn(
+      const createMiddleware = vi.fn(
         (_params) => (_req: unknown, _res: unknown, next: () => void) => {
           countFn();
           next();

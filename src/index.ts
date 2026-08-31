@@ -1,14 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { DynamicModule, Inject, Module, RequestMethod } from '@nestjs/common';
 import {
+  DynamicModule,
   FactoryProvider,
-  MiddlewareConfigProxy,
+  Inject,
   MiddlewareConsumer,
+  Module,
   ModuleMetadata,
   Provider,
+  RequestMethod,
   Type,
-} from '@nestjs/common/interfaces';
+} from '@nestjs/common';
+import { ApplicationConfig } from '@nestjs/core';
+
+// NestJS 12 ships an exports map, under which the `@nestjs/common/interfaces`
+// deep import no longer resolves, and the package root re-exports every name
+// used here but `MiddlewareConfigProxy`. `MiddlewareConsumer.apply` returns it,
+// so it is recovered from there and the option types stay exactly as before.
+type MiddlewareConfigProxy = ReturnType<MiddlewareConsumer['apply']>;
 
 export type SyncOptions<T> = T & {
   /**
@@ -25,10 +32,10 @@ export type SyncOptions<T> = T & {
   exclude?: Parameters<MiddlewareConfigProxy['exclude']>;
 };
 
-// for support of nestjs@8 we don't use
+// `useFactory` is spelled out instead of
 //   extends Pick<FactoryProvider, 'provide' | 'useFactory'>
-// as it's `useFactory` return type in v8 is `T` instead of `T | Promise<T>` as
-// in feature versions, so it's not compatible
+// so that the published option type stays independent of how NestJS types its
+// own factory provider
 export interface AsyncOptions<T> extends Pick<ModuleMetadata, 'imports'> {
   useFactory: (...args: any[]) => SyncOptions<T> | Promise<SyncOptions<T>>;
   inject?: any[];
@@ -45,11 +52,18 @@ export interface FacadeModuleStaticOptional<T> {
 }
 
 /**
- * As NestJS@11 still supports express@4 `*`-style routing by itself let's keep
- * it for the backward compatibility. On the next major NestJS release `*` we
- * can replace it with `/{*splat}`, and drop the support for NestJS@9 and below.
+ * path-to-regexp v8, used by express@5 and @fastify/middie@9, no longer accepts
+ * the unnamed `*` wildcard. NestJS auto-converts it, but warns while doing so
+ * as soon as a global prefix is set — and the conversion it picks, `/v1/{*path}`,
+ * does not match the prefix root itself, so a request to `/v1` reached no
+ * middleware at all.
+ *
+ * The missing leading slash is deliberate, and is supported upstream: since
+ * @nestjs/common@11.0.8 `addLeadingSlash` leaves a path starting with `{/`
+ * alone. A global prefix is then applied as `/v1{/*splat}`, which matches both
+ * `/v1` and everything under it.
  */
-const DEFAULT_ROUTES = [{ path: '*', method: RequestMethod.ALL }];
+const DEFAULT_ROUTES = [{ path: '{/*splat}', method: RequestMethod.ALL }];
 const DEFAULT_OPTIONS: SyncOptions<Record<string, unknown>> = {};
 
 export function createModule<T>(
@@ -92,12 +106,13 @@ export function createModule<T>(
     constructor(
       @Inject(optionsToken)
       private readonly options: SyncOptions<T> | null,
+      private readonly applicationConfig: ApplicationConfig,
     ) {}
 
     configure(consumer: MiddlewareConsumer) {
       const {
         exclude,
-        forRoutes = DEFAULT_ROUTES,
+        forRoutes = this.defaultRoutes(),
         ...createMiddlewaresOpts
       } = this.options || DEFAULT_OPTIONS;
       const result = createMiddlewares(createMiddlewaresOpts as T);
@@ -118,6 +133,28 @@ export function createModule<T>(
       } else {
         consumer.apply(...middlewares).forRoutes(...forRoutes);
       }
+    }
+
+    /**
+     * A path excluded from the global prefix is served outside of it, while
+     * `DEFAULT_ROUTES` is prefixed like any other middleware route, so such a
+     * path would be left without middleware. NestJS adds excluded paths back
+     * on its own, but only for routes that `RouteInfoPathExtractor.isAWildcard`
+     * recognises — which `{/*splat}`, with its leading slash deliberately
+     * missing, is not.
+     *
+     * Only the default applies: an explicit `forRoutes` is the caller's own.
+     */
+    private defaultRoutes() {
+      const { exclude } = this.applicationConfig.getGlobalPrefixOptions();
+
+      return [
+        ...DEFAULT_ROUTES,
+        ...(exclude ?? []).map(({ path, requestMethod }) => ({
+          path,
+          method: requestMethod,
+        })),
+      ];
     }
   }
 
