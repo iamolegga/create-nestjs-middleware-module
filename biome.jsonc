@@ -1,0 +1,44 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.11/schema.json",
+  "formatter": { "indentStyle": "space" },
+  "javascript": {
+    "formatter": { "quoteStyle": "single" },
+    // NestJS builds its DI on constructor parameter decorators, which Biome
+    // refuses to parse without this.
+    "parser": { "unsafeParameterDecoratorsEnabled": true }
+  },
+  "linter": {
+    "rules": {
+      "style": {
+        // Unsafe here: `emitDecoratorMetadata` derives `design:paramtypes`
+        // from the imported bindings, so rewriting a constructor parameter
+        // type as a type-only import erases the metadata and NestJS can no
+        // longer resolve the dependency.
+        "useImportType": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      // `createModule` mirrors the signatures it forwards to: the factory
+      // provider's `useFactory`/`inject` are `any[]` in NestJS itself, and
+      // `MiddlewareConsumer.apply` takes `(Type<any> | Function)[]`, so a
+      // middleware factory has to be allowed to return a bare `Function`.
+      // Narrowing either would change this package's published types, which
+      // nestjs-session and nestjs-cookie-session build on.
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noExplicitAny": "off" },
+          "complexity": { "noBannedTypes": "off" }
+        }
+      }
+    },
+    {
+      // The platform-adapter helper deliberately erases the adapter generics,
+      // which is what this `any` is for.
+      "includes": ["__tests__/**"],
+      "linter": { "rules": { "suspicious": { "noExplicitAny": "off" } } }
+    }
+  ]
+}
