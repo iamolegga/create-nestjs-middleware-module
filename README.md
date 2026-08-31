@@ -8,7 +8,7 @@
     <img alt="npm" src="https://img.shields.io/npm/dm/create-nestjs-middleware-module" />
   </a>
   <a href="https://github.com/iamolegga/create-nestjs-middleware-module/actions">
-    <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module">
+    <img alt="GitHub branch checks state" src="https://badgen.net/github/checks/iamolegga/create-nestjs-middleware-module/master">
   </a>
   <a href="https://qlty.sh/gh/iamolegga/projects/create-nestjs-middleware-module">
     <img src="https://qlty.sh/gh/iamolegga/projects/create-nestjs-middleware-module/coverage.svg" alt="Code Coverage" />
